@@ -13,16 +13,12 @@ def hide_window_for_sec(window_title, minTime = 0):
         hwnd = win32gui.FindWindow(None, window_title)
         if hwnd:
             win32gui.ShowWindow(hwnd, win32con.SW_HIDE)
-        else:
-            print(f'not found {window_title} window')
 
 def show_window(window_title):
     hwnd = win32gui.FindWindow(None, window_title)
     if hwnd:
         win32gui.ShowWindow(hwnd, win32con.SW_SHOWNORMAL)
         return
-
-    print(f'not found {window_title} window')
 
 if __name__ == "__main__":
     show_window(CLIENT_WINDOW)

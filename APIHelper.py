@@ -45,7 +45,7 @@ class LCUAPI(LocalhostAPI):
 
         # If client was not found
         if data is None:
-            print("Please lanuch lol client!")
+            print("lol client are not lanuched")
             return None
 
         # Extract port and token from data
@@ -65,8 +65,8 @@ class LCUAPI(LocalhostAPI):
         temp = base64.b64encode((f"riot:{token}").encode())
         self.headers = { "Authorization":f"Basic {temp.decode()}" }
     
-    def make_match(self):
-        while True:
+    def create_lobby(self):
+        for i in range(5):
             # Try to exit lobby
             self.send_request(Method.DELETE, "/lol-lobby/v2/lobby").close()
             windowHelper.hide_window_for_sec(windowHelper.CLIENT_WINDOW, 1)
@@ -81,10 +81,12 @@ class LCUAPI(LocalhostAPI):
             statusCode = temp.status_code
             temp.close()
             if statusCode // 100 == 2:
-                break
-        
+                return True
+        return False
+    
+    def make_match(self):
+        # Joinin match queue
         while True:
-            # Make match
             print('Joining match queue')
             self.send_request(Method.POST, "/lol-lobby/v2/lobby/matchmaking/search").close()
 
