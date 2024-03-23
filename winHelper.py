@@ -4,12 +4,14 @@ from time import sleep
 import subprocess
 import os
 import psutil
+from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume
 
 RIOT_PATH = r'C:\Riot Games\Riot Client\RiotClientServices.exe'
 CLIENT_WINDOW = 'League of Legends'
 CLIENT_EXE = 'LeagueClient.exe'
 GAME_WINDOW = 'League of Legends (TM) Client'
 GAME_EXE = 'League of Legends.exe'
+RENDER_EXE = 'LeagueClientUxRender.exe'
 
 def killTask(exe):
     os.system(f'taskkill /F /IM "{exe}"')
@@ -60,6 +62,20 @@ def show_window(window_title):
         win32gui.ShowWindow(hwnd, win32con.SW_SHOWNORMAL)
         return
 
+def mute_application(process_name, muted = 1, persist = True):
+    while True:
+        sessions = AudioUtilities.GetAllSessions()
+        for session in sessions:
+            volume_interface = session._ctl.QueryInterface(ISimpleAudioVolume)
+            if session.Process and session.Process.name() == process_name:
+                volume_interface.SetMute(muted, None)  # 1 for mute, 0 for unmute
+                return
+        if not persist:
+            return
+        sleep(1)
+        
 if __name__ == "__main__":
     show_window(CLIENT_WINDOW)
     show_window(GAME_WINDOW)
+    mute_application(RENDER_EXE, 0, False)
+    mute_application(GAME_EXE, 0, False)
