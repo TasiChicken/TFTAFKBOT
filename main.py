@@ -1,24 +1,17 @@
-import time
-from APIHelper import Method, LCUAPI, LocalhostAPI
-import subprocess
-import os
+from time import sleep
+from APIHelper import LCUAPI, LocalhostAPI as Api
+from datetime import datetime
+import traceback
+import winHelper
 
-LAUCH_ARGS = "--launch-product=league_of_legends --launch-patchline=live"
-
-def lanuchClient():
-    # Open League of Legends client
-    print('lauching client')
-    subprocess.Popen(r'"C:\Riot Games\Riot Client\RiotClientServices.exe" --launch-product=league_of_legends --launch-patchline=live', shell=True)
-    print('Waiting 30 sec for client lanuched completely')
-    time.sleep(30)
-
-def waitUntilDead(liveAPI):
-    temp = liveAPI.send_request(Method.GET, '/liveclientdata/activeplayername')
+def waitUntilDead(liveAPI: Api):
+    temp = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername')
     summonerName = temp.text.split('#')[0][1:]
     temp.close()
+    sleep(1)
 
     while True:
-        temp = liveAPI.send_request(Method.GET, '/liveclientdata/playerlist')
+        temp = liveAPI.send_request(method=Api.GET, cmd='/liveclientdata/playerlist')
         jsonData = temp.json()
         temp.close()
         
@@ -29,25 +22,35 @@ def waitUntilDead(liveAPI):
         
         # wait for next detect
         print("waiting for dying")
-        time.sleep(10)
+        sleep(10)
 
 def main():
-    lcuAPI = LCUAPI.createInstance()
-    while lcuAPI is None:
-        lanuchClient()
-        lcuAPI = LCUAPI.createInstance()
-    liveAPI = LocalhostAPI('2999')
-    
     while True:
-        while True:
-            if lcuAPI.create_lobby():
-                break
-            os.system('taskkill /F /IM "LeagueClient.exe"')
-            lanuchClient()
+        try:
+            pt = winHelper.getPortAndToken()
+            lcuAPI = LCUAPI(port=pt[0], token=pt[1])
+            liveAPI = Api('2999')
 
-        lcuAPI.make_match()
-        waitUntilDead(liveAPI)
-        lcuAPI.exit_match()
+            while True:
+                lcuAPI.exit_match()
+                
+                lcuAPI.create_lobby()
+                lcuAPI.join_queue()
+                lcuAPI.accept_match()
+                
+                print('Wait 15 min')
+                winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW)
+                winHelper.hide_window_for_sec(winHelper.GAME_WINDOW, 900)
+
+                waitUntilDead(liveAPI)
+        except:
+            with open('log.txt', 'a') as logFile:
+                logFile.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]"))
+                logFile.write('\n')
+                logFile.write(traceback.format_exc())
+                logFile.write('\n')
+            winHelper.lanuchClient()
+
 
 if __name__ == "__main__":
     main()
