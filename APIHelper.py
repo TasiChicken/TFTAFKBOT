@@ -40,18 +40,16 @@ class LCUAPI():
     def create_lobby(self):
         for i in range(5):
             # Try to exit lobby
-            self.Api.send_request(method=LocalhostAPI.DELETE, cmd="/lol-lobby/v2/lobby").close()
+            self.Api.send_request(method=LocalhostAPI.DELETE, cmd="/lol-lobby/v2/lobby")
             sleep(1)
 
             # Create TFT lobby
             print('Creating lobby')
-            self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby", json={"queueId": 1090}).close()
+            self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby", json={"queueId": 1090})
             sleep(1)
 
             # Check if is in a lobby
-            temp = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby")
-            statusCode = temp.status_code
-            temp.close()
+            statusCode = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby").status_code
             sleep(1)
             
             if statusCode // 100 == 2:
@@ -62,12 +60,10 @@ class LCUAPI():
         # Joinin match queue
         for i in range(5):
             print('Joining match queue')
-            self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby/matchmaking/search").close()
+            self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby/matchmaking/search")
             winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 1)
 
-            temp = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby/matchmaking/search-state")
-            state = temp.json()['searchState']
-            temp.close()
+            state = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby/matchmaking/search-state").json()['searchState']
             winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 1)
 
             if state != 'Invalid':
@@ -81,16 +77,13 @@ class LCUAPI():
             print("waiting for game matched")
             
             # Get matching state
-            temp = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby/matchmaking/search-state")
-            state = temp.json()['searchState']
-            temp.close()
+            state = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby/matchmaking/search-state").json()['searchState']
             winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 1)
 
             # If matchmaking found
             if state == 'Found':
                 # Accept
-                temp = self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-matchmaking/v1/ready-check/accept")
-                temp.close()
+                self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-matchmaking/v1/ready-check/accept")
                 winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 1)
                 
                 # Wait for all summoners to accept 
@@ -98,9 +91,7 @@ class LCUAPI():
                     print('waiting for all accepted')
 
                     # Get matching state
-                    temp = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby/matchmaking/search-state")
-                    state = temp.json()['searchState']
-                    temp.close()
+                    state = self.Api.send_request(method=LocalhostAPI.GET, cmd="/lol-lobby/v2/lobby/matchmaking/search-state").json()['searchState']
                     winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 1)
                     
                     if state == 'Invalid':
@@ -114,9 +105,7 @@ class LCUAPI():
     def exit_match(self):
         # eixt the match
         print("exit the game")
-        temp = self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-gameflow/v1/early-exit")
-        print(temp.text)
-        temp.close()
+        self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-gameflow/v1/early-exit")
         winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 3)
 
         # kill the 

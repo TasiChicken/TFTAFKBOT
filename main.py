@@ -5,15 +5,11 @@ import traceback
 import winHelper
 
 def waitUntilDead(liveAPI: Api):
-    temp = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername')
-    summonerName = temp.text.split('#')[0][1:]
-    temp.close()
+    summonerName = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername').text.split('#')[0][1:]
     sleep(1)
 
     while True:
-        temp = liveAPI.send_request(method=Api.GET, cmd='/liveclientdata/playerlist')
-        jsonData = temp.json()
-        temp.close()
+        jsonData = liveAPI.send_request(method=Api.GET, cmd='/liveclientdata/playerlist').json()
         
         for entry in jsonData:
             if entry["summonerName"] == summonerName:
@@ -46,6 +42,9 @@ def main():
                 winHelper.hide_window_for_sec(winHelper.GAME_WINDOW, 900)
 
                 waitUntilDead(liveAPI)
+        except KeyboardInterrupt:
+            winHelper.show()
+            exit()
         except:
             with open('log.txt', 'a') as logFile:
                 logFile.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]"))

@@ -74,8 +74,11 @@ def mute_application(process_name, muted = 1, persist = True):
             return
         sleep(1)
         
-if __name__ == "__main__":
+def show():
     show_window(CLIENT_WINDOW)
     show_window(GAME_WINDOW)
     mute_application(RENDER_EXE, 0, False)
     mute_application(GAME_EXE, 0, False)
+
+if __name__ == "__main__":
+    show()
