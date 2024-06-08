@@ -4,21 +4,36 @@ from datetime import datetime
 import traceback
 import winHelper
 
-def waitUntilDead(liveAPI: Api):
-    summonerName = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername').text.split('#')[0][1:]
-    sleep(1)
+def write_error_log(error):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]"))
+        logFile.write('\n')
+        logFile.write(error)
+        logFile.write('\n')
 
-    while True:
-        jsonData = liveAPI.send_request(method=Api.GET, cmd='/liveclientdata/playerlist').json()
-        
-        for entry in jsonData:
-            if entry["summonerName"] == summonerName:
-                if entry["isDead"]:
-                    return
-        
-        # wait for next detect
-        print("waiting for dying")
-        sleep(10)
+prev_summonerName = None
+prev_jsonData = None
+def waitUntilDead(liveAPI: Api):
+    try:
+        summonerName = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername').text[1:-1]
+        last_summonerName = summonerName
+        sleep(1)
+
+        while True:
+            jsonData = liveAPI.send_request(method=Api.GET, cmd='/liveclientdata/playerlist').json()
+            last_jsonData = jsonData
+            
+            for entry in jsonData:
+                if entry["summonerName"] == summonerName:
+                    found = True
+                    if entry["isDead"]:
+                        return
+            
+            # wait for next detect
+            print("waiting for dying")
+            sleep(10)
+    except ConnectionError:
+        write_error_log(f'Fail to connect live game api.\nPrevious data is:\n{last_jsonData}\n{last_jsonData}')
 
 def main():
     while True:
@@ -46,11 +61,7 @@ def main():
             winHelper.show()
             exit()
         except:
-            with open('log.txt', 'a') as logFile:
-                logFile.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]"))
-                logFile.write('\n')
-                logFile.write(traceback.format_exc())
-                logFile.write('\n')
+            write_error_log(traceback.format_exc())
             winHelper.lanuchClient()
 
 if __name__ == "__main__":
