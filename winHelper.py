@@ -63,7 +63,11 @@ def show_window(window_title):
         return
 
 def mute_application(process_name, muted = 1, persist = True):
+    time_sec = 0
     while True:
+        if(time_sec > 10):
+            raise TimeoutError("Muting execution timed out")
+        
         sessions = AudioUtilities.GetAllSessions()
         for session in sessions:
             volume_interface = session._ctl.QueryInterface(ISimpleAudioVolume)
@@ -73,6 +77,7 @@ def mute_application(process_name, muted = 1, persist = True):
         if not persist:
             return
         sleep(1)
+        time_sec += 1
         
 def show():
     show_window(CLIENT_WINDOW)

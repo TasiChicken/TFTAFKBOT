@@ -16,7 +16,6 @@ prev_jsonData = None
 def waitUntilDead(liveAPI: Api):
     try:
         summonerName = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername').text[1:-1]
-        last_summonerName = summonerName
         sleep(1)
 
         while True:
@@ -25,7 +24,6 @@ def waitUntilDead(liveAPI: Api):
             
             for entry in jsonData:
                 if entry["summonerName"] == summonerName:
-                    found = True
                     if entry["isDead"]:
                         return
             

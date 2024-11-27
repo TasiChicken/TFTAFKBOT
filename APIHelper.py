@@ -46,6 +46,7 @@ class LCUAPI():
             # Create TFT lobby
             print('Creating lobby')
             self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby", json={"queueId": 1090})
+            #self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby", json={"queueId": 6110})
             sleep(1)
 
             # Check if is in a lobby
