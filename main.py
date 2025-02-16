@@ -62,5 +62,12 @@ def main():
             write_error_log(traceback.format_exc())
             winHelper.lanuchClient()
 
+def print_queue_id():
+    pt = winHelper.getPortAndToken()
+    lcuAPI = LCUAPI(port=pt[0], token=pt[1])
+    queueId = lcuAPI.Api.send_request(Api.GET, '/lol-lobby/v2/lobby').json()['gameConfig']['queueId']
+    print(queueId)
+
 if __name__ == "__main__":
+    #print_queue_id()
     main()
