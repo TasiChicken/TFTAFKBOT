@@ -45,8 +45,9 @@ class LCUAPI():
 
             # Create TFT lobby
             print('Creating lobby')
+            # TODO
+            #self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby", json={"queueId": 6100})
             self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby", json={"queueId": 1090})
-            #self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-lobby/v2/lobby", json={"queueId": 6110})
             sleep(1)
 
             # Check if is in a lobby
@@ -109,7 +110,7 @@ class LCUAPI():
         self.Api.send_request(method=LocalhostAPI.POST, cmd="/lol-gameflow/v1/early-exit")
         winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 3)
 
-        # kill the 
+        # kill the game window
         print("kill game window")
         winHelper.killTask(winHelper.GAME_EXE)
         winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW, 3)

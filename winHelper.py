@@ -65,15 +65,18 @@ def show_window(window_title):
 def mute_application(process_name, muted = 1, persist = True):
     time_sec = 0
     while True:
-        if(time_sec > 10):
+        if(time_sec > 30):
             raise TimeoutError("Muting execution timed out")
         
         sessions = AudioUtilities.GetAllSessions()
         for session in sessions:
             volume_interface = session._ctl.QueryInterface(ISimpleAudioVolume)
-            if session.Process and session.Process.name() == process_name:
-                volume_interface.SetMute(muted, None)  # 1 for mute, 0 for unmute
-                return
+            try:
+                if session.Process and session.Process.name() == process_name:
+                    volume_interface.SetMute(muted, None)  # 1 for mute, 0 for unmute
+                    return
+            except psutil.NoSuchProcess :
+                pass
         if not persist:
             return
         sleep(1)
