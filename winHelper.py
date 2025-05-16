@@ -23,8 +23,8 @@ def lanuchClient():
     # Open League of Legends client
     print('lauching client')
     subprocess.Popen(f'"{RIOT_PATH}" --launch-product=league_of_legends --launch-patchline=live', shell=True)
-    print('Waiting 30 sec for client lanuched completely')
-    hide_window_for_sec(CLIENT_WINDOW, 30)
+    print('Waiting 60 sec for client lanuched completely')
+    hide_window_for_sec(CLIENT_WINDOW, 60)
 
 def getPortAndToken():
     data = None
