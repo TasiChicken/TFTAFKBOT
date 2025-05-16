@@ -5,6 +5,7 @@ import traceback
 import winHelper
 
 def write_error_log(error):
+    print(error)
     with open('log.txt', 'a') as logFile:
         logFile.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]"))
         logFile.write('\n')
@@ -15,23 +16,21 @@ prev_summonerName = None
 prev_jsonData = None
 def waitUntilDead(liveAPI: Api):
     try:
-        summonerName = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername').text[1:-1]
+        summonerName = liveAPI.send_request(Api.GET, '/liveclientdata/activeplayername').text.strip('"')
         sleep(1)
 
         while True:
             jsonData = liveAPI.send_request(method=Api.GET, cmd='/liveclientdata/playerlist').json()
-            last_jsonData = jsonData
             
             for entry in jsonData:
-                if entry["summonerName"] == summonerName:
-                    if entry["isDead"]:
-                        return
+                if entry.get("summonerName") == summonerName and entry.get("isDead"):
+                    return
             
             # wait for next detect
             print("waiting for dying")
             sleep(10)
-    except ConnectionError:
-        write_error_log(f'Fail to connect live game api.\nPrevious data is:\n{last_jsonData}\n{last_jsonData}')
+    except Exception as e:
+        write_error_log(f'{e}')
 
 def main():
     while True:
