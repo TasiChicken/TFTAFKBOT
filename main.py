@@ -49,9 +49,10 @@ def main():
                 
                 print('Wait 15 min')
                 winHelper.hide_window_for_sec(winHelper.GAME_WINDOW, 5)
-                winHelper.mute_application(winHelper.GAME_EXE)
                 winHelper.hide_window_for_sec(winHelper.CLIENT_WINDOW)
-                winHelper.hide_window_for_sec(winHelper.GAME_WINDOW, 900)
+                for i in range(900):
+                    winHelper.mute_application(winHelper.GAME_EXE, 1, False)
+                    winHelper.hide_window_for_sec(winHelper.GAME_WINDOW, 1)
 
                 waitUntilDead(liveAPI)
         except KeyboardInterrupt:
