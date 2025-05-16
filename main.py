@@ -64,8 +64,23 @@ def main():
 def print_queue_id():
     pt = winHelper.getPortAndToken()
     lcuAPI = LCUAPI(port=pt[0], token=pt[1])
-    queueId = lcuAPI.Api.send_request(Api.GET, '/lol-lobby/v2/lobby').json()['gameConfig']['queueId']
-    print(queueId)
+    try:
+        resp = lcuAPI.Api.send_request(Api.GET, '/lol-lobby/v2/lobby')
+    except Exception as e:
+        print(f"Error:{e!r}")
+        return
+
+    if resp.status_code != 200:
+        print(f"Response:{resp.status_code} {resp.reason}")
+        return
+
+    data = resp.json()
+    queue_id = data.get('gameConfig', {}).get('queueId')
+    if queue_id is None:
+        print("There are no queueId in response")
+    else:
+        print(f"queueId = {queue_id}")
+
 
 if __name__ == "__main__":
     #print_queue_id()
